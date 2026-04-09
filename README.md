@@ -1,6 +1,18 @@
-# valkyrja/roadrunner
+<p align="center"><a href="https://valkyrja.io" target="_blank">
+    <img src="https://raw.githubusercontent.com/valkyrjaio/art/refs/heads/master/full-logo/orange/php.png" width="400">
+</a></p>
+
+# Valkyrja RoadRunner
 
 RoadRunner persistent worker entry point for the [Valkyrja Framework](https://www.valkyrja.io).
+
+About
+-----
+
+> This repository provides the RoadRunner persistent worker entry point for the Valkyrja Framework.
+
+Bootstraps the application once at startup, then dispatches every incoming request to an
+isolated child container — so request state never bleeds between requests.
 
 ## Installation
 
@@ -8,7 +20,7 @@ RoadRunner persistent worker entry point for the [Valkyrja Framework](https://ww
 composer require valkyrja/roadrunner
 ```
 
-Requires [RoadRunner](https://roadrunner.dev) with the HTTP plugin
+Requires [RoadRunner](https://docs.roadrunner.dev/docs/php-worker/worker) with the HTTP plugin
 (`spiral/roadrunner-http ^4.1.0`).
 
 ## Usage
@@ -24,8 +36,8 @@ RoadRunnerHttp::run(new HttpConfig(
 ```
 
 `run()` bootstraps the application once when the worker process starts, then
-enters the RoadRunner request loop. Each request is handled in an isolated
-child container so state never bleeds between requests.
+enters the RoadRunner request loop. Each request is handled in an isolated child
+container so state never bleeds between requests.
 
 ## Customising Bootstrap
 
@@ -37,7 +49,7 @@ use Valkyrja\Application\Kernel\Contract\ApplicationContract;
 use Valkyrja\Http\Routing\Collection\Contract\CollectionContract;
 use Valkyrja\RoadRunner\RoadRunnerHttp;
 
-class MyRoadRunnerHttp extends RoadRunnerHttp
+class App extends RoadRunnerHttp
 {
     protected static function bootstrapParentServices(ApplicationContract $app): void
     {
@@ -50,7 +62,7 @@ class MyRoadRunnerHttp extends RoadRunnerHttp
 
 ## Worker Lifecycle
 
-See the [Valkyrja Application README](https://github.com/valkyrja/valkyrja) for
+See the [Valkyrja Framework README](https://github.com/valkyrjaio/valkyrja) for
 a full explanation of the persistent worker lifecycle, the child container
 isolation model, and configuration options.
 
