@@ -26,7 +26,12 @@
   },
   "autoload"          : {
     "psr-4" : {
-      "Valkyrja\\RoadRunner\\" : "src/Valkyrja/RoadRunner"
+      "Valkyrja\\RoadRunner\\" : "src/RoadRunner"
+    }
+  },
+  "autoload-dev"      : {
+    "psr-4" : {
+      "Valkyrja\\RoadRunner\\Tests\\" : "tests/Tests"
     }
   },
   "minimum-stability" : "dev",
