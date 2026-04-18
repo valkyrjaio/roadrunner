@@ -4,80 +4,47 @@
 
 # Valkyrja RoadRunner
 
-RoadRunner persistent worker entry point for the [Valkyrja Framework](https://www.valkyrja.io).
+RoadRunner persistent worker entry point for the [Valkyrja][Valkyrja url]
+PHP framework.
 
-About
------
-
-> This repository provides the RoadRunner persistent worker entry point for the Valkyrja Framework.
-
-Bootstraps the application once at startup, then dispatches every incoming request to an
-isolated child container — so request state never bleeds between requests.
+This integration bootstraps the Valkyrja application once at worker startup,
+then dispatches every incoming request to an isolated child container so
+request state never bleeds between requests. The result is the performance
+benefit of a persistent process without the state-contamination risks of
+naive long-running PHP.
 
 <p>
     <a href="https://packagist.org/packages/valkyrja/roadrunner"><img src="https://poser.pugx.org/valkyrja/roadrunner/require/php" alt="PHP Version Require"></a>
     <a href="https://packagist.org/packages/valkyrja/roadrunner"><img src="https://poser.pugx.org/valkyrja/roadrunner/v" alt="Latest Stable Version"></a>
     <a href="https://packagist.org/packages/valkyrja/roadrunner"><img src="https://poser.pugx.org/valkyrja/roadrunner/license" alt="License"></a>
-    <!-- <a href="https://packagist.org/packages/valkyrja/roadrunner"><img src="https://poser.pugx.org/valkyrja/roadrunner/downloads" alt="Total Downloads"></a>-->
+    <a href="https://github.com/valkyrjaio/valkyrja-roadrunner-php/actions/workflows/ci.yml?query=branch%3A26.x"><img src="https://github.com/valkyrjaio/valkyrja-roadrunner-php/actions/workflows/ci.yml/badge.svg?branch=26.x" alt="CI Status"></a>
     <a href="https://scrutinizer-ci.com/g/valkyrjaio/roadrunner/?branch=26.x"><img src="https://scrutinizer-ci.com/g/valkyrjaio/roadrunner/badges/quality-score.png?b=26.x" alt="Scrutinizer"></a>
     <a href="https://coveralls.io/github/valkyrjaio/roadrunner?branch=26.x"><img src="https://coveralls.io/repos/github/valkyrjaio/roadrunner/badge.svg?branch=26.x" alt="Coverage Status" /></a>
     <a href="https://shepherd.dev/github/valkyrjaio/roadrunner"><img src="https://shepherd.dev/github/valkyrjaio/roadrunner/coverage.svg" alt="Psalm Shepherd" /></a>
     <a href="https://sonarcloud.io/summary/new_code?id=valkyrjaio_roadrunner"><img src="https://sonarcloud.io/api/project_badges/measure?project=valkyrjaio_roadrunner&metric=sqale_rating" alt="Maintainability Rating" /></a>
 </p>
 
-Build Status
+Requirements
 ------------
 
-<table>
-    <tbody>
-        <tr>
-            <td>Linting</td>
-            <td>
-                <a href="https://github.com/valkyrjaio/roadrunner/actions/workflows/phpcodesniffer.yml?query=branch%3A26.x"><img src="https://github.com/valkyrjaio/roadrunner/actions/workflows/phpcodesniffer.yml/badge.svg?branch=26.x" alt="PHP Code Sniffer Build Status"></a>
-            </td>
-            <td>
-                <a href="https://github.com/valkyrjaio/roadrunner/actions/workflows/phpcsfixer.yml?query=branch%3A26.x"><img src="https://github.com/valkyrjaio/roadrunner/actions/workflows/phpcsfixer.yml/badge.svg?branch=26.x" alt="PHP CS Fixer Build Status"></a>
-            </td>
-        </tr>
-        <tr>
-            <td>Coding Rules</td>
-            <td>
-                <a href="https://github.com/valkyrjaio/roadrunner/actions/workflows/phparkitect.yml?query=branch%3A26.x"><img src="https://github.com/valkyrjaio/roadrunner/actions/workflows/phparkitect.yml/badge.svg?branch=26.x" alt="PHPArkitect Build Status"></a>
-            </td>
-            <td>
-                <a href="https://github.com/valkyrjaio/roadrunner/actions/workflows/rector.yml?query=branch%3A26.x"><img src="https://github.com/valkyrjaio/roadrunner/actions/workflows/rector.yml/badge.svg?branch=26.x" alt="Rector Build Status"></a>
-            </td>
-        </tr>
-        <tr>
-            <td>Static Analysis</td>
-            <td>
-                <a href="https://github.com/valkyrjaio/roadrunner/actions/workflows/phpstan.yml?query=branch%3A26.x"><img src="https://github.com/valkyrjaio/roadrunner/actions/workflows/phpstan.yml/badge.svg?branch=26.x" alt="PHPStan Build Status"></a>
-            </td>
-            <td>
-                <a href="https://github.com/valkyrjaio/roadrunner/actions/workflows/psalm.yml?query=branch%3A26.x"><img src="https://github.com/valkyrjaio/roadrunner/actions/workflows/psalm.yml/badge.svg?branch=26.x" alt="Psalm Build Status"></a>
-            </td>
-        </tr>
-        <tr>
-            <td>Testing</td>
-            <td>
-                <a href="https://github.com/valkyrjaio/roadrunner/actions/workflows/phpunit.yml?query=branch%3A26.x"><img src="https://github.com/valkyrjaio/roadrunner/actions/workflows/phpunit.yml/badge.svg?branch=26.x" alt="PHPUnit Build Status"></a>
-            </td>
-            <td></td>
-        </tr>
-    </tbody>
-</table>
-## Installation
+- PHP 8.4+
+- [RoadRunner][roadrunner docs url] with the HTTP plugin
+  (`spiral/roadrunner-http ^4.1.0`)
+- An existing [Valkyrja][framework url] application
 
-```bash
+Installation
+------------
+
+```
 composer require valkyrja/roadrunner
 ```
 
-Requires [RoadRunner](https://docs.roadrunner.dev/docs/php-worker/worker) with the HTTP plugin
-(`spiral/roadrunner-http ^4.1.0`).
+Usage
+-----
 
-## Usage
+Wire the RoadRunner entry point into your application's front controller:
 
-```php
+```
 // app/public/index.php
 use Valkyrja\Application\Data\HttpConfig;
 use Valkyrja\RoadRunner\RoadRunnerHttp;
@@ -88,15 +55,15 @@ RoadRunnerHttp::run(new HttpConfig(
 ```
 
 `run()` bootstraps the application once when the worker process starts, then
-enters the RoadRunner request loop. Each request is handled in an isolated child
-container so state never bleeds between requests.
+enters the RoadRunner request loop. Each request is handled in an isolated
+child container so state never bleeds between requests.
 
-## Customising Bootstrap
+### Customizing Bootstrap
 
 Override `bootstrapParentServices()` to force-resolve services that are
 expensive to create and safe to share across requests:
 
-```php
+```
 use Valkyrja\Application\Kernel\Contract\ApplicationContract;
 use Valkyrja\Http\Routing\Collection\Contract\CollectionContract;
 use Valkyrja\RoadRunner\RoadRunnerHttp;
@@ -112,12 +79,55 @@ class App extends RoadRunnerHttp
 }
 ```
 
-## Worker Lifecycle
+Worker Lifecycle
+----------------
 
-See the [Valkyrja Framework README](https://github.com/valkyrjaio/valkyrja) for
-a full explanation of the persistent worker lifecycle, the child container
-isolation model, and configuration options.
+See the [Valkyrja framework repository][framework url] for a full explanation
+of the persistent worker lifecycle, the child container isolation model, and
+configuration options.
 
-## License
+Related Integrations
+--------------------
 
-MIT
+Other persistent-worker runtime integrations for Valkyrja PHP:
+
+- [**OpenSwoole**][openswoole url] — persistent worker via the OpenSwoole
+  extension
+- [**FrankenPHP**][frankenphp url] — persistent worker via the FrankenPHP
+  embedded runtime
+
+Contributing
+------------
+
+See [`CONTRIBUTING.md`][contributing url] for the submission process and
+[`VOCABULARY.md`][vocabulary url] for the terminology used across Valkyrja.
+
+Security Issues
+---------------
+
+If you discover a security vulnerability, please follow our
+[disclosure procedure][security vulnerabilities url].
+
+License
+-------
+
+Licensed under the [MIT license][MIT license url]. See
+[`LICENSE.md`](./LICENSE.md).
+
+[Valkyrja url]: https://valkyrja.io
+
+[framework url]: https://github.com/valkyrjaio/valkyrja-php
+
+[roadrunner docs url]: https://docs.roadrunner.dev/docs/php-worker/worker
+
+[openswoole url]: https://github.com/valkyrjaio/valkyrja-openswoole-php
+
+[frankenphp url]: https://github.com/valkyrjaio/valkyrja-frankenphp-php
+
+[contributing url]: https://github.com/valkyrjaio/.github/blob/master/CONTRIBUTING.md
+
+[vocabulary url]: https://github.com/valkyrjaio/.github/blob/master/VOCABULARY.md
+
+[security vulnerabilities url]: https://github.com/valkyrjaio/.github/blob/master/SECURITY.md
+
+[MIT license url]: https://opensource.org/licenses/MIT
